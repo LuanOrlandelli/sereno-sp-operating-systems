@@ -148,23 +148,35 @@ As imagens abaixo registram a implantação e os testes realizados na VM `Sereno
 
 ## Evidências
 
-### Ubuntu Server instalado
+### 01 — Ubuntu Server instalado
+A captura identifica o Ubuntu Server 24.04.5 LTS, o hostname `sereno-server`, a execução em máquina virtual e o armazenamento do sistema, comprovando a instalação e o acesso ao ambiente Linux.
+
 ![Ubuntu Server 24.04.5 LTS instalado e acessível](evidencias/01-ubuntu-instalado.png)
 
-### Infraestrutura Linux, rede e serviços ativos
-![Verificação de rede, Nginx PostgreSQL e SSH](evidencias/02-rede-servicos.png)
+### 02 — Infraestrutura Linux, rede e serviços ativos
+O terminal apresenta a interface `enp0s3` com IP `10.0.2.15/24`, a rota padrão, os servidores DNS e os serviços SSH, Nginx, PostgreSQL, API e monitoramento em estado `active`.
 
-### Acesso web do Windows ao Nginx
-![Acesso via porta 8081 retornando HTTP 200](evidencias/03-nginx-windows-200.png)
+![Verificação de rede e serviços ativos](evidencias/02-rede-servicos.png)
 
-### PostgreSQL com tabelas e migrações
-![Seis tabelas e três migrações](evidencias/04-migracoes-banco.png)
+### 03 — Acesso web do Windows ao Nginx
+A requisição realizada no Windows pela porta `8081` retorna `HTTP/1.1 200 OK` e o JSON do health check, demonstrando o redirecionamento de portas do VirtualBox e o funcionamento do proxy reverso.
 
-### API ASP.NET Core respondendo HTTP 200
-![Health check na VM](evidencias/05-api-health.png)
+![Acesso pelo Windows via Nginx retornando HTTP 200](evidencias/03-nginx-windows-200.png)
 
-### API acessada do Windows, banco online
-![Health check via NAT do VirtualBox](evidencias/06-api-health-windows.png)
+### 04 — PostgreSQL com tabelas e migrações
+A consulta ao PostgreSQL lista as seis tabelas da solução e confirma três migrações do Entity Framework Core registradas em `__EFMigrationsHistory`.
+
+![Seis tabelas e três migrações do Entity Framework Core](evidencias/04-migracoes-banco.png)
+
+### 05 — API ASP.NET Core respondendo HTTP 200
+O serviço `sereno-api` aparece como `enabled` e `active`, enquanto a requisição local a `127.0.0.1:5000/health` retorna `HTTP/1.1 200 OK`, com API e banco online.
+
+![Serviço da API e health check na VM](evidencias/05-api-health.png)
+
+### 06 — API acessada do Windows, banco online
+As chamadas pelo Windows aos endpoints `/api/totens` e `/health`, via `127.0.0.1:8081`, retornam HTTP 200. A listagem de totens responde com um conjunto vazio e o health check confirma a integração com o banco.
+
+![Endpoints da API acessados do Windows via NAT](evidencias/06-api-health-windows.png)
 
 ### 07 — Monitoramento e alertas de CPU, memória e disco
 A execução com limites de teste zerados (`CPU_LIMITE=0`, `MEMORIA_LIMITE=0` e `DISCO_LIMITE=0`) gerou os três alertas sem induzir sobrecarga real no servidor.
