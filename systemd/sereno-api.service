@@ -1,0 +1,20 @@
+[Unit]
+Description=Sereno SP - API ASP.NET Core
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=serenoapp
+WorkingDirectory=/opt/sereno-sp
+ExecStart=/usr/bin/dotnet /opt/sereno-sp/Sereno.Api.dll
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+EnvironmentFile=/etc/sereno-sp/sereno.env
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

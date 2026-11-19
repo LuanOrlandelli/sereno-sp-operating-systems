@@ -1,0 +1,14 @@
+[Unit]
+Description=Sereno SP - Monitoramento de CPU Memoria e Disco
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/sereno-monitoramento.sh
+Restart=always
+RestartSec=5
+User=root
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

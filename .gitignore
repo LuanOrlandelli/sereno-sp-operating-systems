@@ -1,0 +1,14 @@
+# Nao publicar credenciais, arquivos locais ou binarios
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+*.log
+.vs/
+**/bin/
+**/obj/
+publish-linux/
+*.zip
