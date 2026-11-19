@@ -71,16 +71,17 @@ No Windows, a partir da pasta que contém os projetos e o diretório `publish-li
 
 ```powershell
 scp -P 2223 -r .\publish-linux ubuntu-server@127.0.0.1:/home/ubuntu-server/
-scp -P 2223 .\sereno-migrations.sql ubuntu-server@127.0.0.1:/home/ubuntu-server/
+scp -P 2223 .\database\sereno-migrations.sql ubuntu-server@127.0.0.1:/home/ubuntu-server/
 ```
 
 A partir da pasta local **deste repositório**:
 
 ```powershell
-scp -P 2223 -r .\scripts .\systemd .\nginx ubuntu-server@127.0.0.1:/home/ubuntu-server/sereno-os/
+ssh -p 2223 ubuntu-server@127.0.0.1 "mkdir -p ~/sereno-os"
+scp -P 2223 -r .\scripts .\systemd .\nginx .\database ubuntu-server@127.0.0.1:/home/ubuntu-server/sereno-os/
 ```
 
-> Antes da cópia acima, crie `/home/ubuntu-server/sereno-os` no Ubuntu com `mkdir -p ~/sereno-os`. A cópia usa o diretório do repositório e arquivos locais de publicação; senhas não devem ser inseridas no Git.
+Os comandos criam previamente a pasta de destino. O arquivo `/etc/sereno-sp/sereno.env` contém as credenciais e **não deve ser copiado para o repositório**.
 
 ### 3. Rede, aplicação e banco
 
@@ -131,7 +132,7 @@ systemctl is-active sereno-monitor.service
 systemctl show sereno-monitor.service -p MainPID -p NRestarts
 ```
 
-O systemd mantém o serviço habilitado para iniciar no boot e o reinicia após encerramento inesperado (`Restart=always`, `RestartSec=5`). O experimento registrado apresentou PID anterior `5638`, PID posterior `5697` e `NRestarts=1`.
+O systemd mantém o serviço habilitado para iniciar no boot e o reinicia após encerramento inesperado (`Restart=always`, `RestartSec=5`). No teste documentado na evidência 07b, o processo passou do PID `5697` para `7023`, com `NRestarts=2` e logs do systemd confirmando o reinício após `SIGKILL`.
 
 ### 6. Logs e auditoria
 
@@ -143,7 +144,7 @@ sudo journalctl -u sereno-monitor.service -n 20 --no-pager
 sudo journalctl -u sereno-api.service -n 20 --no-pager
 ```
 
-As imagens abaixo foram capturadas durante a execução da infraestrutura no laboratório. Os arquivos de log dos scripts de provisionamento são gerados **quando esses scripts forem executados**; a implantação inicial foi feita com os comandos equivalentes no terminal.
+As imagens abaixo registram a implantação e os testes realizados na VM `Sereno-SP-OS-Final`, incluindo a execução dos dois scripts de provisionamento, o monitoramento, os alertas, a recuperação automática e a verificação HTTP da API.
 
 ## Evidências
 
@@ -165,12 +166,29 @@ As imagens abaixo foram capturadas durante a execução da infraestrutura no lab
 ### API acessada do Windows, banco online
 ![Health check via NAT do VirtualBox](evidencias/06-api-health-windows.png)
 
-### Monitoramento, alertas e recuperação automática
-![Alertas de CPU memória e disco com reinício pelo systemd](evidencias/07-monitoramento-alertas-restart.png)
+### 07 — Monitoramento e alertas de CPU, memória e disco
+A execução com limites de teste zerados (`CPU_LIMITE=0`, `MEMORIA_LIMITE=0` e `DISCO_LIMITE=0`) gerou os três alertas sem induzir sobrecarga real no servidor.
+
+![Monitoramento de CPU memoria e disco com simulacao de alertas](evidencias/07-monitoramento-alertas-restart.png)
+
+### 07b — Tolerância a falhas e reinicialização automática
+Após o encerramento intencional do processo do monitor (`SIGKILL`), o systemd iniciou um novo processo e registrou a recuperação do serviço.
+
+![Reinicializacao automatica do monitor pelo systemd](evidencias/07b-reinicio-automatico.png)
+
+### 08 — Provisionamento da rede
+Execução do script `01-provisionar-rede.sh` com verificação de interface, IP, rota padrão, DNS, SSH e registro de auditoria.
+
+![Provisionamento automatizado da rede e log de execucao](evidencias/08-provisionamento-rede.png)
+
+### 09 — Provisionamento da aplicação
+Execução do script `02-provisionar-aplicacao.sh`, verificação dos serviços habilitados e ativos, das três migrações EF Core e do health check HTTP 200 com banco online.
+
+![Provisionamento da aplicacao concluido com migracoes e health check](evidencias/09-provisionamento-aplicacao.png)
 
 ## Demonstração em vídeo
 
-A demonstração de até **7 minutos** deve apresentar a VM, acesso por SSH, `/health`, banco com migrações, execução do monitoramento e logs, simulação dos três alertas e teste de reinício do serviço. O vídeo deverá ser anexado ou disponibilizado na entrega conforme instruções da disciplina.
+A demonstração em vídeo, com duração máxima de **7 minutos**, apresenta a VM, o acesso por SSH, os scripts de provisionamento, o `/health`, o banco com as migrações, os logs de monitoramento, a simulação dos três alertas e a reinicialização automática do serviço. O vídeo deve ser disponibilizado na entrega conforme as instruções da disciplina.
 
 ## Critérios técnicos apresentados
 
