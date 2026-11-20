@@ -202,6 +202,8 @@ Execução do script `02-provisionar-aplicacao.sh`, verificação dos serviços 
 
 A demonstração em vídeo, com duração máxima de **7 minutos**, apresenta a VM, o acesso por SSH, os scripts de provisionamento, o `/health`, o banco com as migrações, os logs de monitoramento, a simulação dos três alertas e a reinicialização automática do serviço. O vídeo deve ser disponibilizado na entrega conforme as instruções da disciplina.
 
+https://youtu.be/-KyeOLhKuwY
+
 ## Critérios técnicos apresentados
 
 | Critério | Implementação |
